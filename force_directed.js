@@ -9,6 +9,9 @@ let tempera;
 let iter;
 let transition_time = 200;
 
+let xScale;
+let yScale;
+
 // 定义宽高
 let margin = {top: 100, right: 150, bottom: 150, left: 150};
 let width = window.innerWidth - margin.left - margin.right ; // Use the window's width 
@@ -159,19 +162,44 @@ function update_attractive_forces(){
 function update_point_position(t_width, t_height){
     // update point position
     let d;
+    // 迭代提前终止标记
     flag = true;
+    let x_min = width * 2;
+    let y_min = height * 2;
+    let x_max = 0;
+    let y_max = 0;
     for (let i = 0;i < n;i++){
         d = dist(disp[i][0], disp[i][1]);
-        if (d > 5){
+        if (d > 10){
             flag = false;
         }
         points[i][0] += (disp[i][0]) / d * Math.min(d, t_width);
         points[i][1] += (disp[i][1]) / d * Math.min(d, t_height);
-        points[i][0] = Math.min(width, Math.max(0, points[i][0]));
-        points[i][1] = Math.min(height, Math.max(0, points[i][1]));
+        x_max = Math.max(x_max, points[i][0]);
+        y_max = Math.max(y_max, points[i][1]);
+        x_min = Math.min(x_min, points[i][0]);
+        y_min = Math.min(y_min, points[i][1]);
+        // points[i][0] = Math.min(width, Math.max(0, points[i][0]));
+        // points[i][1] = Math.min(height, Math.max(0, points[i][1]));
     }
-    // 迭代提前终止标记
-    return flag;
+    if(flag){
+        return true;
+    }
+
+    xScale = d3.scale.linear()
+                .domain([x_min, x_max]) 
+                .range([0, width]); 
+                // .range([margin.left, width]); 
+    yScale = d3.scale.linear()
+                .domain([y_min, y_max]) 
+                .range([0, height]); 
+                // .range([margin.top, height]); 
+
+    for (let i = 0;i < n;i++){
+        points[i][0] = xScale(points[i][0]);
+        points[i][1] = yScale(points[i][1]);
+    }
+    return false;
 }
 
 function init_point(){
@@ -196,7 +224,7 @@ async function Fruchterman_Rheingold(){
     let it = 0;
     let t_width = width;
     let t_height = height;
-    k = 0.8 * Math.sqrt(width * height / n);
+    k = 0.95 * Math.sqrt(width * height / n);
     
     D3_enter();
 
