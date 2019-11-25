@@ -2,7 +2,18 @@
     fill: none;
     stroke: #ffab00;
     stroke-width: 3;
+    z-index: 1;
 }
+/* .line_style_highlight {
+    fill: purple;
+    stroke: purple;
+    background-color: purple;
+    border-top-color: purple;
+    border-bottom-color: purple;
+    display: inline;
+    stroke-width: 10;
+    z-index: 99;
+} */
 .dot1 {
     fill:steelblue;
     /* stroke: #5E5E5E; */

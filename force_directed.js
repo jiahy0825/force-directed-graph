@@ -32,6 +32,25 @@ function appear_text(node, name){
     document.getElementById("div_city_name").style.top = y + 8 + 'px'; 
     document.getElementById("div_city_name").innerHTML = name; 
     document.getElementById("div_city_name").style.display = ""; 
+
+    // console.log(node.id);
+    // u = node.id;
+    // let lines_change = [];
+    // let idx = 0;
+    // for (let i = 0;i < rela[u].length;i++){
+    //     lines_change[idx] = [u, rela[u][i]];
+    //     idx++;
+    // }
+    // console.log(idx, lines_change);
+    // svg.selectAll("line")
+    //     .data(lines_change)
+    //     // .enter()
+    //     // .append("line")
+    //         .attr("class", "line_style_highlight") // 为样式分配类
+    //         .attr("x1", function(d) { return points[d[0]][0] })
+    //         .attr("y1", function(d) { return points[d[0]][1] })
+    //         .attr("x2", function(d) { return points[d[1]][0] })
+    //         .attr("y2", function(d) { return points[d[1]][1] });
 }
 
 function hide_text(node){
@@ -239,7 +258,7 @@ async function Fruchterman_Rheingold(){
         
         D3_update();
 
-        await sleep(transition_time - 50);
+        await sleep(transition_time - 100);
 
         it++;
         document.getElementById("iter_time").innerHTML = "迭代次数: " + it; 
@@ -247,7 +266,7 @@ async function Fruchterman_Rheingold(){
         t_height *= tempera;
     }
 
-    D3_exit();
+    // D3_exit();
 }
 
 function map2matrtix(){
@@ -282,7 +301,7 @@ function update(){
 
     // Fruchterman-Rheingold算法，计算出点的坐标
     tempera = 0.8;
-    iter = 100;
+    iter = 50;
     init_point();
     Fruchterman_Rheingold();
 }
