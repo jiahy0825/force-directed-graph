@@ -1,0 +1,26 @@
+.line_style {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+.dot1 {
+    fill:steelblue;
+    /* stroke: #5E5E5E; */
+    stroke: steelblue;
+    stroke-width: 3;
+}
+.dot2 {
+    fill: #46b478;
+    stroke: #46b478;
+    stroke-width: 3;
+}
+.dot3 {
+    fill: #b44682;;
+    stroke: #b44682;
+    stroke-width: 3;
+}
+.dot4 {
+    fill: #b47846;;
+    stroke: #b47846;
+    stroke-width: 3;
+}
