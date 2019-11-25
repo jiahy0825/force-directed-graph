@@ -24,6 +24,76 @@ let svg = d3.select("body").append("svg")
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+d3.selection.prototype.bringElementAsTopLayer = function() {
+    return this.each(function(){
+    this.parentNode.appendChild(this);
+    });
+};
+
+d3.selection.prototype.pushElementAsBackLayer = function() { 
+    return this.each(function() { 
+        var firstChild = this.parentNode.firstChild; 
+        if (firstChild) { 
+            this.parentNode.insertBefore(this, firstChild); 
+        } 
+    }); 
+};
+
+function is_high_light_line(node, flag){
+    let u = node.id;
+    let lines_change = [];
+    let idx = 0;
+    if (!rela.hasOwnProperty(u)){
+        return;
+    }
+    for (let i = 0;i < rela[u].length;i++){
+        lines_change[idx] = [u, rela[u][i]];
+        idx++;
+    }
+    // console.log(idx, lines_change);
+    // d3.select("body")
+    //     .selectAll("line")
+    //     .data(lines_change)
+    //     .exit()
+    //     .remove();
+    if (flag){
+        svg.selectAll("line")
+        .data(lines_change)
+            .attr("class", "line_style_highlight") // 为样式分配类
+            .attr("x1", function(d) { return points[d[0]][0] })
+            .attr("y1", function(d) { return points[d[0]][1] })
+            .attr("x2", function(d) { return points[d[1]][0] })
+            .attr("y2", function(d) { return points[d[1]][1] })
+            .bringElementAsTopLayer();
+    }else{
+        svg.selectAll("line")
+        .data(lines_change)
+            .attr("class", "line_style") // 为样式分配类
+            .attr("x1", function(d) { return points[d[0]][0] })
+            .attr("y1", function(d) { return points[d[0]][1] })
+            .attr("x2", function(d) { return points[d[1]][0] })
+            .attr("y2", function(d) { return points[d[1]][1] })
+            .pushElementAsBackLayer();
+    }
+    // svg.selectAll("line")
+    //     .data(lines_change)
+    //     // .enter()
+    //     // .append("line")
+    //         .attr("class", function() {
+    //             if (flag){
+    //                 return "line_style_highlight";
+    //             }else{
+    //                 return "line_style";
+    //             }
+    //         } ) // 为样式分配类
+    //         .attr("x1", function(d) { return points[d[0]][0] })
+    //         .attr("y1", function(d) { return points[d[0]][1] })
+    //         .attr("x2", function(d) { return points[d[1]][0] })
+    //         .attr("y2", function(d) { return points[d[1]][1] })
+    //         .bringElementAsTopLayer();
+}
+
+
 function appear_text(node, name){
     var x = node.getBoundingClientRect().left;
     var y = node.getBoundingClientRect().top;
@@ -33,30 +103,15 @@ function appear_text(node, name){
     document.getElementById("div_city_name").innerHTML = name; 
     document.getElementById("div_city_name").style.display = ""; 
 
-    // console.log(node.id);
-    // u = node.id;
-    // let lines_change = [];
-    // let idx = 0;
-    // for (let i = 0;i < rela[u].length;i++){
-    //     lines_change[idx] = [u, rela[u][i]];
-    //     idx++;
-    // }
-    // console.log(idx, lines_change);
-    // svg.selectAll("line")
-    //     .data(lines_change)
-    //     // .enter()
-    //     // .append("line")
-    //         .attr("class", "line_style_highlight") // 为样式分配类
-    //         .attr("x1", function(d) { return points[d[0]][0] })
-    //         .attr("y1", function(d) { return points[d[0]][1] })
-    //         .attr("x2", function(d) { return points[d[1]][0] })
-    //         .attr("y2", function(d) { return points[d[1]][1] });
+    is_high_light_line(node, true);
 }
 
 function hide_text(node){
     node.style.r = 4;
     document.getElementById("div_city_name").innerHTML = ""; 
     document.getElementById("div_city_name").style.display = "none"; 
+
+    is_high_light_line(node, false);
 }
 
 function D3_enter(){
@@ -266,7 +321,7 @@ async function Fruchterman_Rheingold(){
         t_height *= tempera;
     }
 
-    // D3_exit();
+    D3_exit();
 }
 
 function map2matrtix(){
