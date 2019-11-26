@@ -14,7 +14,20 @@
         <script src="./force_directed.js" charset="utf-8"></script>
 
         <div id="div_city_name" style="display:none;position:absolute;z-index:1;"></div>
-        <div id="iter_time" style="left: 1000px;top: 50px;position: absolute;float: left;font-size: large;"></div>
+
+        <div id="rangeK-div" class="factorK"> 设置系数K：0.95 </div>
+        <input id="rangeK-slider" class="factorK-slider" type="range" min="0.01" max="0.99" step="0.01" value="0.95" oninput="changeK()"/>
+
+        <div id="rangeDecay-div" class="factor-decay"> 衰减因子：0.8 </div>
+        <input id="rangeDecay-slider" class="factor-decay-slider" type="range" min="0.01" max="0.99" step="0.01" value="0.8" oninput="changeDecay()"/>
+
+        <div id="rangeIter-div" class="iter"> 迭代次数：50 </div>
+        <input id="rangeIter-slider" class="iter-slider" type="range" min="10" max="150" step="5" value="50" oninput="changeIter()"/>
+
+        <input type="button" class="run-button" onclick="Fruchterman_Rheingold()" value="点击运行">  </button>
+        <input type="button" class="reset-button" onclick="reset_para()" value="重置参数">  </button>
+
+        <div id="iter_time" class="iter_time_style"></div>
     </body>
 
 </html>

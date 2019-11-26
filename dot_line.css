@@ -31,3 +31,65 @@
     stroke: #b47846;
     stroke-width: 3;
 }
+.factorK{
+    left: 50px;
+    top: 50px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.factorK-slider {
+    left: 200px;
+    top: 50px;
+    position: absolute;
+    width: 150px;
+}
+.factor-decay{
+    left: 400px;
+    top: 50px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.factor-decay-slider {
+    left: 550px;
+    top: 50px;
+    position: absolute;
+    width: 150px;
+}
+.iter{
+    left: 750px;
+    top: 50px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.iter-slider {
+    left: 900px;
+    top: 50px;
+    position: absolute;
+    width: 150px;
+}
+.run-button{
+    left: 1080px;
+    width: 100px;
+    top: 48px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.reset-button{
+    left: 1200px;
+    width: 100px;
+    top: 48px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.iter_time_style{
+    left: 1350px;
+    top: 50px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}

@@ -10,6 +10,8 @@ let tempera;
 let iter;
 let transition_time = 200;
 
+let factorK;
+
 let xScale;
 let yScale;
 
@@ -59,7 +61,6 @@ function is_high_light_line(node, flag){
             idx++;
         }
     }
-    // console.log(idx, lines_change);
 
     if (flag){
         svg.selectAll("line")
@@ -267,19 +268,23 @@ function update_point_position(t_width, t_height){
     let y_min = height * 2;
     let x_max = 0;
     let y_max = 0;
+    let x_update = 0;
+    let y_update = 0;
     for (let i = 0;i < n;i++){
         d = dist(disp[i][0], disp[i][1]);
-        if (d > 10){
+        x_update = (disp[i][0]) / d * Math.min(d, t_width);
+        y_update = (disp[i][1]) / d * Math.min(d, t_height);
+        if (x_update > 0.25 || y_update > 0.25){
             flag = false;
         }
-        points[i][0] += (disp[i][0]) / d * Math.min(d, t_width);
-        points[i][1] += (disp[i][1]) / d * Math.min(d, t_height);
+        points[i][0] += x_update;
+        points[i][1] += y_update;
+        // points[i][0] += (disp[i][0]) / d * Math.min(d, t_width);
+        // points[i][1] += (disp[i][1]) / d * Math.min(d, t_height);
         x_max = Math.max(x_max, points[i][0]);
         y_max = Math.max(y_max, points[i][1]);
         x_min = Math.min(x_min, points[i][0]);
         y_min = Math.min(y_min, points[i][1]);
-        // points[i][0] = Math.min(width, Math.max(0, points[i][0]));
-        // points[i][1] = Math.min(height, Math.max(0, points[i][1]));
     }
     if(flag){
         return true;
@@ -323,27 +328,28 @@ async function Fruchterman_Rheingold(){
     let it = 0;
     let t_width = width;
     let t_height = height;
-    k = 0.95 * Math.sqrt(width * height / n);
-    
-    D3_enter();
+    k = factorK * Math.sqrt(width * height / n);
 
+    init_point();
+    
     while (it < iter){
         updata_replulsive_forces();
 
         update_attractive_forces();
         
         if (update_point_position(t_width, t_height)){
+            window.alert("迭代提前终止！迭代次数：" + it);
             break;
         }
         
         D3_update();
 
-        await sleep(transition_time - 100);
-
         it++;
-        document.getElementById("iter_time").innerHTML = "迭代次数: " + it; 
+        document.getElementById("iter_time").innerHTML = "已迭代 : " + it + "次"; 
         t_width *= tempera;
         t_height *= tempera;
+
+        await sleep(transition_time - 100);
     }
 
     D3_exit();
@@ -386,18 +392,48 @@ function revert_matrix(){
     }
 }
 
-function update(){
+function init(){
     update_point_num();
 
     // 获取点之间的连接信息
     map2matrtix();
     revert_matrix();
 
-    // Fruchterman-Rheingold算法，计算出点的坐标
-    tempera = 0.8;
-    iter = 50;
+    reset_para();
+    
     init_point();
-    Fruchterman_Rheingold();
+    
+    D3_enter();
+
+    // Fruchterman-Rheingold算法，计算出点的坐标
+    // Fruchterman_Rheingold();
+}
+
+function changeK(){
+    factorK = document.getElementById("rangeK-slider").value;
+    document.getElementById("rangeK-div").innerHTML = "设置系数K：" + factorK;
+}
+
+function changeDecay(){
+    tempera = document.getElementById("rangeDecay-slider").value;
+    document.getElementById("rangeDecay-div").innerHTML = "衰减因子：" + tempera;
+}
+
+function changeIter(){
+    iter = document.getElementById("rangeIter-slider").value;
+    document.getElementById("rangeIter-div").innerHTML = "迭代次数：" + iter;
+}
+
+function reset_para(){
+    factorK = 0.95;
+    document.getElementById("rangeK-slider").value = factorK;
+    document.getElementById("rangeK-div").innerHTML = "设置系数K：" + factorK;
+    tempera = 0.8;
+    document.getElementById("rangeDecay-slider").value = tempera;
+    document.getElementById("rangeDecay-div").innerHTML = "衰减因子：" + tempera;
+    iter = 50;
+    document.getElementById("rangeIter-slider").value = iter = 50;
+    document.getElementById("rangeIter-div").innerHTML = "迭代次数：" + iter;
 }
 
 // 读取json文件
@@ -405,8 +441,6 @@ d3.json("./data/info.json", function(info){
     // 获取节点最大计数
     rela = info[1];
     city = info[0];
-    // console.log(city);
-    // rela = {0:[1], 1:[2]};
 
-    update();
+    init();
 });
