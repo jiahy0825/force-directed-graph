@@ -1,4 +1,5 @@
 let rela;
+let rela_r;
 let city;
 let lines;
 let points;
@@ -43,61 +44,52 @@ function is_high_light_line(node, flag){
     let u = node.id;
     let lines_change = [];
     let idx = 0;
-    if (!rela.hasOwnProperty(u)){
+    if (!rela.hasOwnProperty(u) && !rela_r.hasOwnProperty(u)){
         return;
     }
-    for (let i = 0;i < rela[u].length;i++){
-        lines_change[idx] = [u, rela[u][i]];
-        idx++;
+    if (rela.hasOwnProperty(u)){
+        for (let i = 0;i < rela[u].length;i++){
+            lines_change[idx] = [u, rela[u][i]];
+            idx++;
+        }
+    }
+    if (rela_r.hasOwnProperty(u)){
+        for (let i = 0;i < rela_r[u].length;i++){
+            lines_change[idx] = [u, rela_r[u][i]];
+            idx++;
+        }
     }
     // console.log(idx, lines_change);
-    // d3.select("body")
-    //     .selectAll("line")
-    //     .data(lines_change)
-    //     .exit()
-    //     .remove();
+
     if (flag){
         svg.selectAll("line")
-        .data(lines_change)
-            .attr("class", "line_style_highlight") // 为样式分配类
-            .attr("x1", function(d) { return points[d[0]][0] })
-            .attr("y1", function(d) { return points[d[0]][1] })
-            .attr("x2", function(d) { return points[d[1]][0] })
-            .attr("y2", function(d) { return points[d[1]][1] })
-            .bringElementAsTopLayer();
+            .data(lines_change)
+                // .classed('line_style_highlight', true)
+                .attr("class", "line_style_highlight") // 为样式分配类
+                .attr("x1", function(d) { return points[d[0]][0] })
+                .attr("y1", function(d) { return points[d[0]][1] })
+                .attr("x2", function(d) { return points[d[1]][0] })
+                .attr("y2", function(d) { return points[d[1]][1] })
+                .bringElementAsTopLayer();
     }else{
-        svg.selectAll("line")
-        .data(lines_change)
-            .attr("class", "line_style") // 为样式分配类
-            .attr("x1", function(d) { return points[d[0]][0] })
-            .attr("y1", function(d) { return points[d[0]][1] })
-            .attr("x2", function(d) { return points[d[1]][0] })
-            .attr("y2", function(d) { return points[d[1]][1] })
-            .pushElementAsBackLayer();
+        D3_update_high_light();
+        // svg.selectAll("line")
+        //     .data(lines_change)
+        //         // .classed('line_style_highlight', false)
+        //         .attr("class", "line_style") // 为样式分配类
+        //         .attr("x1", function(d) { return points[d[0]][0] })
+        //         .attr("y1", function(d) { return points[d[0]][1] })
+        //         .attr("x2", function(d) { return points[d[1]][0] })
+        //         .attr("y2", function(d) { return points[d[1]][1] })
+        //         .bringElementAsTopLayer();
     }
-    // svg.selectAll("line")
-    //     .data(lines_change)
-    //     // .enter()
-    //     // .append("line")
-    //         .attr("class", function() {
-    //             if (flag){
-    //                 return "line_style_highlight";
-    //             }else{
-    //                 return "line_style";
-    //             }
-    //         } ) // 为样式分配类
-    //         .attr("x1", function(d) { return points[d[0]][0] })
-    //         .attr("y1", function(d) { return points[d[0]][1] })
-    //         .attr("x2", function(d) { return points[d[1]][0] })
-    //         .attr("y2", function(d) { return points[d[1]][1] })
-    //         .bringElementAsTopLayer();
 }
 
 
 function appear_text(node, name){
     var x = node.getBoundingClientRect().left;
     var y = node.getBoundingClientRect().top;
-    node.style.r = 8;
+    node.style.r = 10;
     document.getElementById("div_city_name").style.left = x + 8 + 'px'; 
     document.getElementById("div_city_name").style.top = y + 8 + 'px'; 
     document.getElementById("div_city_name").innerHTML = name; 
@@ -138,6 +130,39 @@ function D3_enter(){
             .attr("cx", function(d) { return d[0] })
             .attr("cy", function(d) { return d[1] })
             .attr("r", 4);
+
+    // svg.selectAll("circle")
+    //     .on("mouseover", function(d) {
+    //         d3.select(this).classed('line_style_highlight', true);
+    //         this.parentNode.appendChild(this);
+    //     })
+    //     .on("mouseout", function(d) {
+    //         d3.select(this).classed('line_style_highlight', false);
+    //     });
+}
+
+function D3_update_high_light(){
+    // 添加连线
+    svg.selectAll("line")
+    .data(lines)
+        .attr("class", "line_style") // 为样式分配类
+        .attr("x1", function(d) { return points[d[0]][0] })
+        .attr("y1", function(d) { return points[d[0]][1] })
+        .attr("x2", function(d) { return points[d[1]][0] })
+        .attr("y2", function(d) { return points[d[1]][1] })
+        .bringElementAsTopLayer();
+
+    // 添加节点
+    svg.selectAll("circle")
+        .data(points)
+            .attr("class", function(d, i) { return ("dot" + city[i]["city_type"]) }) // 为样式分配类
+            .attr("onmouseover", function(d, i) { return ("appear_text(this, \"" + city[i]["name"] + "\")") })
+            .attr("onmouseout", "hide_text(this)")
+            .attr("id", function(d, i) { return i })
+            .attr("cx", function(d) { return d[0] })
+            .attr("cy", function(d) { return d[1] })
+            .attr("r", 4)
+            .bringElementAsTopLayer();
 }
 
 function D3_update(){
@@ -348,11 +373,25 @@ function update_point_num(){
     console.log("points length", n);
 }
 
+function revert_matrix(){
+    rela_r = [];
+    for (u in rela){
+        for (i in rela[u]){
+            v = rela[u][i];
+            if (!rela_r.hasOwnProperty(v)){
+                rela_r[v] = new Array();
+            }
+            rela_r[v].push(u);
+        }
+    }
+}
+
 function update(){
     update_point_num();
 
     // 获取点之间的连接信息
     map2matrtix();
+    revert_matrix();
 
     // Fruchterman-Rheingold算法，计算出点的坐标
     tempera = 0.8;

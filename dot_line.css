@@ -2,13 +2,13 @@
     fill: none;
     stroke: #ffab00;
     stroke-width: 3;
-    z-index: 1;
+    /* z-index: 1; */
 }
 .line_style_highlight {
     fill: none;
     stroke: purple;
-    stroke-width: 10;
-    z-index: 9999;
+    stroke-width: 3;
+    /* z-index: 9999; */
 }
 .dot1 {
     fill:steelblue;
