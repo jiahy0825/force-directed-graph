@@ -1,7 +1,12 @@
 let rela;
 let rela_r;
+let rela_all;
 let city;
+
 let lines;
+let connect_lines = [];
+
+let points_click = [];
 let points;
 let disp;
 let n;
@@ -65,27 +70,99 @@ function is_high_light_line(node, flag){
     if (flag){
         svg.selectAll("line")
             .data(lines_change)
-                // .classed('line_style_highlight', true)
                 .attr("class", "line_style_highlight") // 为样式分配类
                 .attr("x1", function(d) { return points[d[0]][0] })
                 .attr("y1", function(d) { return points[d[0]][1] })
                 .attr("x2", function(d) { return points[d[1]][0] })
                 .attr("y2", function(d) { return points[d[1]][1] })
                 .bringElementAsTopLayer();
+
+        // 可尝试将该处节点放大
+
     }else{
         D3_update_high_light();
-        // svg.selectAll("line")
-        //     .data(lines_change)
-        //         // .classed('line_style_highlight', false)
-        //         .attr("class", "line_style") // 为样式分配类
-        //         .attr("x1", function(d) { return points[d[0]][0] })
-        //         .attr("y1", function(d) { return points[d[0]][1] })
-        //         .attr("x2", function(d) { return points[d[1]][0] })
-        //         .attr("y2", function(d) { return points[d[1]][1] })
-        //         .bringElementAsTopLayer();
     }
 }
 
+function update_connect_line(visited, start, end, res){
+    console.log("update_connect_line begin", start, end, res);
+    connect_lines = [];
+    let idx = 0;
+    connect_lines[idx++] = [res, end];
+    while (res != start){
+        connect_lines[idx++] = [visited[res], res];
+        res = visited[res];
+    }
+    document.getElementById("connect_line").innerHTML = "最短路径长度：" + connect_lines.length; 
+    D3_update_high_light();
+}
+
+function bfs(start, end){
+    if (start == end){
+        return false;
+    }
+    let visited = [];
+    let q = [];
+    let idx = 0;
+    let cur = 0;
+    let tmp = 0;
+    let v = 0;
+    q[idx++] = start;
+    for (let i = 0;i < n;i++){
+        visited[i] = -1;
+    }
+    visited[start] = start;
+    while (cur < q.length){
+        let size = q.length;
+        while (cur < size){
+            tmp = q[cur++];
+            if (!rela_all.hasOwnProperty(tmp)){
+                continue;
+            }
+            for (let i = 0;i < rela_all[tmp].length;i++){
+                v = rela_all[tmp][i];
+                if (v == end){
+                    update_connect_line(visited, start, end, tmp);
+                    return true;
+                }
+                if (visited[v] == -1){
+                    visited[v] = tmp;
+                    q[idx++] = v;
+                }
+            }
+        }
+    }
+    for (let i = 0;i < n;i++){
+        if (visited[i] != -1){
+        }
+    }
+    return false;
+}
+
+function update_click_node(node){
+    let size = points_click.length;
+    let id = node.id;
+    if (size == 0){
+        points_click.push(id);
+        document.getElementById("select_point").innerHTML = "已选定1个点"; 
+        return;
+    }
+    if (size == 1){
+        if (points_click[0] == id){
+            return;
+        }else{
+            points_click.push(id);
+            document.getElementById("select_point").innerHTML = "已选定2个点"; 
+            if (!bfs(points_click[0], points_click[1])){
+                window.alert("没有最短路径！");
+            }
+            return;
+        }
+    }
+    points_click = [];
+    points_click.push(id);
+    document.getElementById("select_point").innerHTML = "已选定1个点"; 
+}
 
 function appear_text(node, name){
     var x = node.getBoundingClientRect().left;
@@ -127,6 +204,7 @@ function D3_enter(){
             .attr("class", function(d, i) { return ("dot" + city[i]["city_type"]) }) // 为样式分配类
             .attr("onmouseover", function(d, i) { return ("appear_text(this, \"" + city[i]["name"] + "\")") })
             .attr("onmouseout", "hide_text(this)")
+            .attr("onclick", "update_click_node(this)")
             .attr("id", function(d, i) { return i })
             .attr("cx", function(d) { return d[0] })
             .attr("cy", function(d) { return d[1] })
@@ -153,12 +231,20 @@ function D3_update_high_light(){
         .attr("y2", function(d) { return points[d[1]][1] })
         .bringElementAsTopLayer();
 
+    if (connect_lines.length != 0){
+        svg.selectAll("line")
+        .data(connect_lines)
+            .attr("class", "line_connect_highlight") // 为样式分配类
+            .attr("x1", function(d) { return points[d[0]][0] })
+            .attr("y1", function(d) { return points[d[0]][1] })
+            .attr("x2", function(d) { return points[d[1]][0] })
+            .attr("y2", function(d) { return points[d[1]][1] })
+            .bringElementAsTopLayer();
+    }
+
     // 添加节点
     svg.selectAll("circle")
         .data(points)
-            .attr("class", function(d, i) { return ("dot" + city[i]["city_type"]) }) // 为样式分配类
-            .attr("onmouseover", function(d, i) { return ("appear_text(this, \"" + city[i]["name"] + "\")") })
-            .attr("onmouseout", "hide_text(this)")
             .attr("id", function(d, i) { return i })
             .attr("cx", function(d) { return d[0] })
             .attr("cy", function(d) { return d[1] })
@@ -343,7 +429,7 @@ async function Fruchterman_Rheingold(){
         }
         
         D3_update();
-
+        
         it++;
         document.getElementById("iter_time").innerHTML = "已迭代 : " + it + "次"; 
         t_width *= tempera;
@@ -351,8 +437,11 @@ async function Fruchterman_Rheingold(){
 
         await sleep(transition_time - 100);
     }
-
     D3_exit();
+
+    await sleep(transition_time - 100);
+
+    D3_update_high_light();
 }
 
 function map2matrtix(){
@@ -381,6 +470,7 @@ function update_point_num(){
 
 function revert_matrix(){
     rela_r = [];
+    rela_all = [];
     for (u in rela){
         for (i in rela[u]){
             v = rela[u][i];
@@ -388,6 +478,14 @@ function revert_matrix(){
                 rela_r[v] = new Array();
             }
             rela_r[v].push(u);
+            if (!rela_all.hasOwnProperty(u)){
+                rela_all[u] = new Array();
+            }
+            rela_all[u].push(v);
+            if(!rela_all.hasOwnProperty(v)){
+                rela_all[v] = new Array();
+            }
+            rela_all[v].push(u);
         }
     }
 }

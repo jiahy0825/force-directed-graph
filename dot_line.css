@@ -10,6 +10,12 @@
     stroke-width: 3;
     /* z-index: 9999; */
 }
+.line_connect_highlight {
+    fill: none;
+    stroke: red;
+    stroke-width: 3;
+    /* z-index: 9999; */
+}
 .dot1 {
     fill:steelblue;
     /* stroke: #5E5E5E; */
@@ -87,8 +93,22 @@
     font-size: large;
 }
 .iter_time_style{
-    left: 1350px;
-    top: 50px;
+    left: 400px;
+    top: 10px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.connect_line_style{
+    left: 200px;
+    top: 10px;
+    position: absolute;
+    float: left;
+    font-size: large;
+}
+.select_point_style{
+    left: 50px;
+    top: 10px;
     position: absolute;
     float: left;
     font-size: large;
