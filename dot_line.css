@@ -16,6 +16,11 @@
     stroke-width: 3;
     /* z-index: 9999; */
 }
+.dot0 {
+    fill: #000000;;
+    stroke: #000000;
+    stroke-width: 1;
+}
 .dot1 {
     fill:steelblue;
     /* stroke: #5E5E5E; */
@@ -30,11 +35,6 @@
 .dot3 {
     fill: #b44682;;
     stroke: #b44682;
-    stroke-width: 3;
-}
-.dot4 {
-    fill: #b47846;;
-    stroke: #b47846;
     stroke-width: 3;
 }
 .factorK{
